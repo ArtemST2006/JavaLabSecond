@@ -58,6 +58,20 @@ public class MainClass {
                     case "info":
                         printInfo();
 
+                    case "delete":
+                        trie.delete(command[1]);
+                        System.out.println("deleted");
+                        break;
+
+                    case "print":
+                        trie.printTree();
+                        break;
+
+                    case "save":
+                        trie.saveToFile(command[1]);
+                        System.out.println("saved to " + command[1]);
+                        break;
+
                     default:
                         System.out.println("Неверная команда");
                 }
@@ -80,6 +94,9 @@ public class MainClass {
         System.out.println("  load <путь_к_файлу> — Загрузить слова из файла в Trie.");
         System.out.println("  info               — Вывести это сообщение с информацией о командах.");
         System.out.println("  stop               — Завершить выполнение программы.");
+        System.out.println("  delete <слово>     — Удалить слово из Trie. Если есть, то удолится");
+        System.out.println("  print              — Вывести структуру дерева.");
+        System.out.println("  save <путь_к_файлу> — Сохранить все слова из Trie в файл.");
     }
 }
 

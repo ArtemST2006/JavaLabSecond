@@ -1,6 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 class Node {
     char value;
@@ -97,6 +102,86 @@ class Node {
         }
         return null;
     }
+
+    public boolean delete(String word) {
+        if (word.isEmpty()) {
+            if (!isTerminate) {
+                return false;
+            }
+            isTerminate = false;
+            return child == null || !child.iterator().hasNext();
+        }
+
+        char c = word.charAt(0);
+        Node childNode = find(c);
+        if (childNode == null) {
+            return false;
+        }
+
+        boolean shouldDeleteChild = childNode.delete(word.substring(1));
+
+        if (shouldDeleteChild) {
+            removeChild(c);
+            return !isTerminate && (child == null || !child.iterator().hasNext());
+        }
+
+        return false;
+    }
+
+    private void removeChild(char c) {
+        if (child == null) return;
+
+        NodeList<Node> prev = null;
+        NodeList<Node> current = ((MyList<Node>) child).head;
+        while (current != null) {
+            if (current.data.value == c) {
+                if (prev == null) {
+                    ((MyList<Node>) child).head = current.next;
+                    if (((MyList<Node>) child).head == null) {
+                        ((MyList<Node>) child).tail = null;
+                    }
+                } else {
+                    prev.next = current.next;
+                    if (current.next == null) {
+                        ((MyList<Node>) child).tail = prev;
+                    }
+                }
+                return;
+            }
+            prev = current;
+            current = current.next;
+        }
+    }
+
+    public void printTree(String prefix, StringBuilder indent, boolean isLast) {
+        if (value != ' ') {
+            System.out.println(indent + (isLast ? "└── " : "├── ") + value + (isTerminate ? " [*]" : ""));
+            if (child != null) {
+                indent.append(isLast ? "    " : "│   ");
+                int size = 0;
+                for (Node n : child) size++;
+                int i = 0;
+                for (Node n : child) {
+                    i++;
+                    n.printTree(prefix, indent, i == size);
+                }
+                indent.setLength(indent.length() - 4);
+            }
+        } else {
+            if (child != null) {
+                System.out.println("Trie:");
+                int size = 0;
+                for (Node n : child) size++;
+                int i = 0;
+                for (Node n : child) {
+                    i++;
+                    n.printTree(prefix, indent, i == size);
+                }
+            } else {
+                System.out.println("пусто");
+            }
+        }
+    }
 }
 
 class Trie {
@@ -132,6 +217,28 @@ class Trie {
             }
         } catch (FileNotFoundException e) {
             System.out.println("Файл не найден: " + filename);
+        }
+    }
+
+    public void delete(String word) {
+        if (word == null || word.isEmpty()) return;
+        root.delete(word);
+    }
+
+    public void printTree() {
+        StringBuilder indent = new StringBuilder();
+        root.printTree("", indent, true);
+    }
+
+    public void saveToFile(String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            MyList<String> allWords = getByPrefix("");
+            for (String word : allWords) {
+                writer.write(word);
+                writer.write(System.lineSeparator());
+            }
+        } catch (IOException e) {
+            System.err.println("Ошибка записи в файл: " + filename);
         }
     }
 }

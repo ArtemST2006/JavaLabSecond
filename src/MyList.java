@@ -12,8 +12,8 @@ class NodeList<T> {
 }
 
 public class MyList<T> implements Iterable<T> {
-    private NodeList<T> head;
-    private NodeList<T> tail;
+    NodeList<T> head;
+    NodeList<T> tail;
 
     public MyList() {
         this.head = null;
